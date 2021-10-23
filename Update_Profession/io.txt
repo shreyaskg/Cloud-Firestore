@@ -1,0 +1,13 @@
+## Input
+{
+
+	"user_doc_id":"000Test"
+
+}
+
+## Output
+{
+
+	 'status':'ok'
+
+}
