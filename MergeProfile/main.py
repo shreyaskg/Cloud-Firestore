@@ -1,3 +1,4 @@
+
 # Merging Profiles based on origin timestamp
 import requests
 import firebase_admin
@@ -17,8 +18,7 @@ cred = credentials.Certificate(r"C:\Users\shrey\PycharmProjects\Cloud_function_2
 # db = firestore.client()
 
 def MergeDictionaries(d1,d2):
-    d1 = d2.copy()   
-    d2.update(d1)   
+    d2.update(d1)
     return d2
 
 # This function deleted all the documents within sub_collection and also finally deletes the document
@@ -73,9 +73,9 @@ def MergeProfile(user_doc_id1,user_doc_id2):
 
     for data_1 in list(data1.keys()):
         
-        if data1[data_1] in ['',0,'0','NA',None] or isinstance(data1[data_1],collections.Mapping):
+        if data1[data_1] in ['',0,'0','NA',None] or isinstance(data1[data_1],collections.Mapping) or isinstance(data1[data_1],list):
             
-            # If the field exists within data 1 as well, we need to update the values
+            # If the field exists within data 2 as well, we need to update the values
             if data_1 in list(data2.keys()):
                 
                 # If the field is a dictionary, then we will have to merge the values individually
@@ -88,12 +88,14 @@ def MergeProfile(user_doc_id1,user_doc_id2):
                         
                             if data1[data_1][key] in ['',0,'0','NA',None]:
                                 # Replacing only the values that need to be replaced 
-                                data1[data_1][key] = data2[data_1][key]
-                                del data2[data_1][key]
-                            del data2[data_1][key]
+                                data1[data_1][key] = data2[data_1][key]        
                     data1[data_1] = MergeDictionaries(data1[data_1],data2[data_1])
-                    
+ 
                 # If the field is not a dictionary we can replace the value directly
+                elif isinstance(data1[data_1],list):
+                    data1[data_1] += data2[data_1]
+                    data1[data_1] = set(data1[data_1])
+                    data1[data_1] = list(data_1)
                 else:
                     data1[data_1] = data2[data_1]
                     del data2[data_1]
@@ -103,7 +105,6 @@ def MergeProfile(user_doc_id1,user_doc_id2):
                     
             # If the data exists and is not a garbage value we replace the value in the second document with the first
     db.collection('Profile').document(user_doc_id1).set(data1,merge = True)
-        
 
     # Also we must update the sub-collections if it doesn't exist in the first document, replace it it exists
     sub_collection_1 = []
@@ -199,5 +200,4 @@ def Swapper(user_doc_id1,user_doc_id2):
     else:
         MergeProfile(user_doc_id1,user_doc_id2)
         return 
-    
-Swapper('000000Test','00abc')
+Swapper('000000Test','000Test')
