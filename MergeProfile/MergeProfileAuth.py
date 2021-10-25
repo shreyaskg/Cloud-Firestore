@@ -1,3 +1,4 @@
+
 # Merging Profiles based on origin timestamp
 import firebase_admin
 import collections
@@ -7,17 +8,14 @@ try:
     collectionsAbc = collections.abc
 except AttributeError:
     collectionsAbc = collections
-
+from firebase_admin import credentials
 from flask import jsonify
 from firebase_admin import firestore, auth
-# from firebase_admin import credentials
 
 # cred = credentials.Certificate(r"C:\Users\shrey\PycharmProjects\Cloud_function_26\2\UpdateExistingTalent\AccountServiceKey.json")
 
 # firebase_admin.initialize_app(cred)
 # db = firestore.client()
-firebase_admin.initialize_app()
-db = firestore.client()
 
 def MergeDictionaries(d1,d2):
     d2.update(d1)
@@ -148,7 +146,6 @@ def MergeProfile(user_doc_id1,user_doc_id2):
 
             # If the sub collection doesn't exist within the user_doc_id1's sub_collections
             if sub_coll not in sub_collection_1:
-
                 # Then we create the sub_collection and add the sub-collection data from user_doc_id2
                 for doc in collection_data:
                     data = doc.to_dict()
@@ -182,17 +179,17 @@ def MergeProfile(user_doc_id1,user_doc_id2):
         author=temp_data2['author']
         db.collection('Profile').document(ref1.id).set({'email':email,'author':author},merge=True)
     
-    auth.set_custom_user_claims(author,{'user_doc_id':ref1.id})
+#     auth.set_custom_user_claims(author,{'user_doc_id':ref1.id})
 
     # Since we always merge data of user_doc_id2 to user_doc_id1, we will always delete the user_doc_id2 document 
-    DeleteProfile(ref2.id)
+#     DeleteProfile(ref2.id)
 
 
 
 # The MergeProfile function always merges user_doc_id2 to user_doc_id1, this function controls that as per timestamps
 def hello_world(request):
     
-    recdata = flask.request.json
+    recdata = request
     user_doc_id1 = recdata['doc_id_1']
     user_doc_id2 = recdata['doc_id_2']
     
@@ -206,7 +203,7 @@ def hello_world(request):
     
     if not data1 or not data2:
         print("Data doesn't exist")
-        return jsonify({'status': False,'message':'Data does not exist'})
+#         return jsonify({'status': False,'message':'Data does not exist'})
     # If origin exits compare, and if we need we can swap user_doc_id1 and user_doc_id2
     time_stamp = 'time_stamps'
     
@@ -238,6 +235,4 @@ def hello_world(request):
     else:
         MergeProfile(user_doc_id1,user_doc_id2)
         ret_data ={'status': True,'message':'Profiles merged'}
-
-
-    return jsonify(ret_data)
+hello_world({'doc_id_1':'00abc','doc_id_2':'000aTest'})
