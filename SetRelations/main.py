@@ -17,7 +17,7 @@ def relation_set(input_data):
    doc_ref = input_data['user_docid']
 
    base_url = "https://maps.googleapis.com/maps/api/geocode/json?"
-   AUTH_KEY = "AIzaSyDKLCOQ7zgXOQZqIvp853W6dXU1XMktmtk"
+   AUTH_KEY = ""
 
    # If current nominee is true then all other fields must be false
 
